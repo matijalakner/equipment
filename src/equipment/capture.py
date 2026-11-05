@@ -12,7 +12,7 @@ import re
 import time
 from pathlib import Path
 
-from .utils import utc_timestamp
+from .utils import DEFAULT_INPUT_DIR, utc_timestamp
 
 LOG_HEADER = ["time_s", "index", "file", "utc"]
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
@@ -21,7 +21,7 @@ _SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 # ---------------------------------------------------------------------------
 # file names
 # ---------------------------------------------------------------------------
-def capture_folder(name, input_dir="input"):
+def capture_folder(name, input_dir=DEFAULT_INPUT_DIR):
     if not _SAFE_NAME.match(str(name)):
         raise ValueError(f"name '{name}' may only contain letters, digits, '.', '_' and '-'")
     return Path(input_dir) / "folder" / name

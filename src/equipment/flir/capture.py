@@ -19,7 +19,7 @@ import cv2
 
 from ..capture import CaptureLog, _report, capture_folder, next_index, numbered_path
 from ..utils import read_cfg as _read_cfg
-from ..utils import utc_timestamp
+from ..utils import DEFAULT_INPUT_DIR, utc_timestamp
 from .camera import FlirCamera, list_cameras, make_exif, save_image, to_bgr
 
 SETTING_KEYS = ("shutter", "gain", "whitebalance", "wb_red", "wb_blue", "gamma",
@@ -96,14 +96,14 @@ def main_flir_info(cfg=None):
 def main_flir_photo(cfg):
     """Manual photo(s).
 
-    cfg: name; optional input_dir ('input'), output_csv (log path), interactive
+    cfg: name; optional input_dir ('data/input'), output_csv (log path), interactive
     (Enter takes a photo, q + Enter quits), serial, backend, save_format
     (jpg/png/tiff), quality, and the settings shutter, gain, whitebalance,
     wb_red, wb_blue, gamma, black_level, pixel_format, defaults.
     Returns the list of saved files.
     """
     get = _read_cfg(cfg)
-    folder = capture_folder(get("name"), get("input_dir") or "input")
+    folder = capture_folder(get("name"), get("input_dir") or DEFAULT_INPUT_DIR)
     saved, log = [], CaptureLog(get("output_csv"))
     try:
         with _connect(get) as cam:
@@ -137,7 +137,7 @@ def main_flir_timelapse(cfg):
     if duration is not None:
         n_dur = int(float(duration) // interval) + 1
         count = n_dur if count is None else min(int(count), n_dur)
-    folder = capture_folder(get("name"), get("input_dir") or "input")
+    folder = capture_folder(get("name"), get("input_dir") or DEFAULT_INPUT_DIR)
 
     saved, log = [], CaptureLog(get("output_csv"))
     try:
@@ -180,7 +180,7 @@ def main_flir_video(cfg):
     duration = get("duration")
     if duration is not None and float(duration) <= 0:
         raise ValueError("duration must be > 0 s")
-    folder = capture_folder(get("name"), get("input_dir") or "input")
+    folder = capture_folder(get("name"), get("input_dir") or DEFAULT_INPUT_DIR)
     codec = (get("codec") or "mp4v")[:4]
 
     saved, log = [], CaptureLog(get("output_csv"))
@@ -309,7 +309,7 @@ def main_flir_live(cfg=None):
     """
     get = _read_cfg(cfg or {})
     name = get("name") or "live"
-    folder = capture_folder(name, get("input_dir") or "input")
+    folder = capture_folder(name, get("input_dir") or DEFAULT_INPUT_DIR)
     width = int(get("width") or 1280)
     win = "FLIR live  (q = quit, h = help)"
     saved = []

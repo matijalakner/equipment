@@ -22,16 +22,16 @@ CANON = {"camera_type": "canon", "shutter": "1/250", "iso": 100,
 PM400 = {"power": True, "wavelength": 450, "averaging_count": 10}
 
 # pE-300 + PM400: optical power at every intensity step
-main_paired_ramp({**RAMP_PE300, **PM400, "output_csv": "output/ramp/pe300_pm400.csv"})
+main_paired_ramp({**RAMP_PE300, **PM400, "output_csv": "data/output/ramp/pe300_pm400.csv"})
 
 # pE-300 + FLIR: a photo in the middle of every step
 main_paired_ramp({**RAMP_PE300, **FLIR, "camera": "pe300-flir",
-                  "output_csv": "output/ramp/pe300_flir.csv"})
+                  "output_csv": "data/output/ramp/pe300_flir.csv"})
 
 # pE-300 + FLIR + PM400 at once (power every 2 s instead of once per step)
 main_paired_ramp({**RAMP_PE300, **FLIR, **PM400, "camera": "pe300-flir-pm",
-                  "power_interval": 2, "output_csv": "output/ramp/pe300_flir_pm400.csv"})
+                  "power_interval": 2, "output_csv": "data/output/ramp/pe300_flir_pm400.csv"})
 
 # DC2200 + Canon (the classic ramp with photos) + PM400
 main_paired_ramp({**RAMP_DC2200, **CANON, **PM400, "camera": "dc-canon-pm",
-                  "output_csv": "output/ramp/dc2200_canon_pm400.csv"})
+                  "output_csv": "data/output/ramp/dc2200_canon_pm400.csv"})

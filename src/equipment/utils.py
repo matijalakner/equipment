@@ -4,6 +4,11 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Default folders: photos and videos go to DEFAULT_INPUT_DIR/folder/<name>/,
+# logs and measurement data to DEFAULT_OUTPUT_DIR/<kind>/.
+DEFAULT_INPUT_DIR = "data/input"
+DEFAULT_OUTPUT_DIR = "data/output"
+
 
 def utc_timestamp(compact=False):
     """Current UTC time, e.g. 2026-10-30T12:34:56.789Z (compact: 20261030T123456Z)."""

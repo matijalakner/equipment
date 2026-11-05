@@ -15,7 +15,7 @@ cfg = SimpleNamespace(
     step=0.05,            # A, current increase per step
     step_time=2.0,        # s, how long EACH step is held
     cycles=1,             # number of min -> max -> min cycles
-    output_csv="output/ramp/example_ramp.csv",   # first line: time_stamp,<UTC>
+    output_csv="data/output/ramp/example_ramp.csv",   # first line: time_stamp,<UTC>
 )
 
 try:

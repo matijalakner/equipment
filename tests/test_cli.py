@@ -97,7 +97,7 @@ def test_dc2200_ramp_default_csv_name(calls):
     _, cfg = run(calls, "dc2200", "ramp", "--min", "0", "--max", "0.5", "--step", "0.1",
                  "--step-time", "1")
     p = Path(cfg["output_csv"])
-    assert p.parent == Path("output/ramp") and p.name.startswith("ramp_")
+    assert p.parent == Path("data/output/ramp") and p.name.startswith("ramp_")
 
 
 def test_ramp_camera_option_without_photos_is_refused(calls):
@@ -152,7 +152,7 @@ def test_pm400_measure(calls, device):
     assert target == "thorlabs.pm400:main_power_measurement"
     assert cfg["wavelength"] == 633 and cfg["sample_duration"] == 2
     assert cfg["sample_rate"] == 5 and cfg["pm400_serial"] == "P1"
-    assert Path(cfg["output_csv"]).parent == Path("output/pm")
+    assert Path(cfg["output_csv"]).parent == Path("data/output/pm")
 
 
 def test_pm400_old_option_names(calls):
@@ -166,7 +166,7 @@ def test_liv(calls):
     assert target == "experiments.liv:main_liv_measurement"
     assert cfg["source"] == "dc2200"
     assert cfg["i_min"] == 0 and cfg["i_max"] == 0.05
-    assert Path(cfg["output_csv"]) == Path("output/liv/liv_run1.csv")
+    assert Path(cfg["output_csv"]) == Path("data/output/liv/liv_run1.csv")
 
 
 # -- Canon -------------------------------------------------------------------
@@ -180,7 +180,7 @@ def test_canon_photo(calls):
                       "--iso", "200", "--color-temp", "5200")
     assert target == "canon.capture:main_photo"
     assert cfg["name"] == "sample-1" and cfg["interactive"] is True
-    assert cfg["colortemperature"] == "5200" and cfg["input_dir"] == "input"
+    assert cfg["colortemperature"] == "5200" and cfg["input_dir"] == "data/input"
 
 
 def test_canon_timelapse(calls):
@@ -334,3 +334,15 @@ def test_pe300_hold_invalid(calls, argv):
     with pytest.raises(SystemExit) as e:
         cli.main(argv)
     assert e.value.code == 2 and calls == []
+
+
+def test_default_folders_are_under_data(calls):
+    _, cfg = run(calls, "pe300", "ramp", "--channels", "B", "--min", "0", "--max", "10",
+                 "--step", "5", "--step-time", "1", "--photos", "s1", "--camera", "flir")
+    assert Path(cfg["output_csv"]).parent == Path("data/output/ramp")
+    assert cfg["input_dir"] == "data/input"
+
+
+def test_capture_folder_default():
+    from equipment.capture import capture_folder
+    assert capture_folder("run1") == Path("data/input/folder/run1")

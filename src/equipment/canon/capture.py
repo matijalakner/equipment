@@ -16,7 +16,7 @@ from pathlib import Path
 from ..capture import (CaptureLog, _report, capture_folder, next_index,  # noqa: F401
                        numbered_path)
 from ..utils import read_cfg as _read_cfg
-from ..utils import utc_timestamp
+from ..utils import DEFAULT_INPUT_DIR, utc_timestamp
 from .camera import VIDEO_SUFFIXES, CanonCamera
 
 SETTING_KEYS = ("shutter", "iso", "whitebalance", "colortemperature", "picturestyle",
@@ -71,13 +71,13 @@ def main_camera_info(cfg=None):
 def main_photo(cfg):
     """Manual photo(s).
 
-    cfg: name; optional input_dir ('input'), output_csv (log path), interactive
+    cfg: name; optional input_dir ('data/input'), output_csv (log path), interactive
     (Enter takes a photo, q + Enter quits), keep_on_card, sync_clock and the
     camera settings shutter, iso, whitebalance, colortemperature, picturestyle,
     imageformat. Returns the list of saved files.
     """
     get = _read_cfg(cfg)
-    folder = capture_folder(get("name"), get("input_dir") or "input")
+    folder = capture_folder(get("name"), get("input_dir") or DEFAULT_INPUT_DIR)
     saved, log = [], CaptureLog(get("output_csv"))
     try:
         with _connect(get) as cam:
@@ -119,7 +119,7 @@ def main_timelapse(cfg):
     if duration is not None:
         n_dur = int(float(duration) // interval) + 1
         count = n_dur if count is None else min(int(count), n_dur)
-    folder = capture_folder(get("name"), get("input_dir") or "input")
+    folder = capture_folder(get("name"), get("input_dir") or DEFAULT_INPUT_DIR)
 
     saved, log = [], CaptureLog(get("output_csv"))
     try:
@@ -161,7 +161,7 @@ def main_video(cfg):
     duration = get("duration")
     if duration is not None and float(duration) <= 0:
         raise ValueError("duration must be > 0 s")
-    folder = capture_folder(get("name"), get("input_dir") or "input")
+    folder = capture_folder(get("name"), get("input_dir") or DEFAULT_INPUT_DIR)
 
     saved, log = [], CaptureLog(get("output_csv"))
     try:

@@ -12,8 +12,8 @@
 Pairing: every light source's ramp can be combined with any measurement:
     equipment <dc2200|pe300> ramp ... [--photos NAME [--camera canon|flir]] [--power]
 
-Data:   <output-dir>/<ramp|pm|liv|camera>/<kind>_<UTC time>.csv   (default output/)
-Files:  <input-dir>/folder/<name>/<name>_XXXX.jpg                 (default input/)
+Data:   <output-dir>/<ramp|pm|liv|camera>/<kind>_<UTC time>.csv   (default data/output/)
+Files:  <input-dir>/folder/<name>/<name>_XXXX.jpg                 (default data/input/)
 
 Nothing hardware-specific is imported until a command runs, so ``--help``
 works without any driver installed, and a missing library only matters for
@@ -24,7 +24,7 @@ import sys
 from importlib import import_module
 
 from . import __version__
-from .utils import output_csv_path, utc_timestamp
+from .utils import DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR, output_csv_path, utc_timestamp
 
 CURRENT_WARNING = "Currents are in AMPERES (0 - 2 A). Check the LED head's rating first."
 
@@ -82,8 +82,8 @@ def _cmd(subparsers, name, help_text, **kwargs):
 
 def add_output_options(parser, kind, prefix=None):
     g = parser.add_argument_group("output")
-    g.add_argument("--output-dir", default="output", metavar="DIR",
-                   help=f"root output folder; data goes to DIR/{kind}/ (default: output)")
+    g.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR, metavar="DIR",
+                   help=f"root output folder; data goes to DIR/{kind}/ (default: {DEFAULT_OUTPUT_DIR})")
     g.add_argument("--output-csv", default=None, metavar="FILE",
                    help=f"CSV name (default: {prefix or kind}_<UTC time>.csv). A plain "
                         f"name is saved in DIR/{kind}/, a path is used as given.")
@@ -104,8 +104,8 @@ def add_pm400_serial(parser):
 def add_name_options(parser):
     parser.add_argument("name", help="measurement name: files are saved as "
                                      "<input-dir>/folder/<name>/<name>_XXXX.<ext>")
-    parser.add_argument("--input-dir", default="input", metavar="DIR",
-                        help="root folder for the captured files (default: input)")
+    parser.add_argument("--input-dir", default=DEFAULT_INPUT_DIR, metavar="DIR",
+                        help=f"root folder for the captured files (default: {DEFAULT_INPUT_DIR})")
 
 
 def add_canon_settings(parser, shared=True):
@@ -237,8 +237,8 @@ def add_photo_options(parser):
                              "(default: half the step time)")
     timing.add_argument("--photo-interval", type=_positive_float, default=None, metavar="S",
                         help="instead: a photo every S seconds from the ramp start")
-    ph.add_argument("--input-dir", default="input", metavar="DIR",
-                    help="root folder for the photos (default: input)")
+    ph.add_argument("--input-dir", default=DEFAULT_INPUT_DIR, metavar="DIR",
+                    help=f"root folder for the photos (default: {DEFAULT_INPUT_DIR})")
     ph.add_argument("--keep-on-card", action="store_true",
                     help="Canon: also keep the photos on the memory card")
     ph.add_argument("--shutter", "--exposure", dest="shutter", default=None,
@@ -461,8 +461,8 @@ def build_parser():
     flv.add_argument("name", nargs="?", default="live",
                      help="prefix of the snapshots, saved as "
                           "<input-dir>/folder/<name>/<name>_XXXX.jpg (default: live)")
-    flv.add_argument("--input-dir", default="input", metavar="DIR",
-                     help="root folder for the snapshots (default: input)")
+    flv.add_argument("--input-dir", default=DEFAULT_INPUT_DIR, metavar="DIR",
+                     help=f"root folder for the snapshots (default: {DEFAULT_INPUT_DIR})")
     flv.add_argument("--width", type=_positive_int, default=1280, metavar="PX",
                      help="window width in pixels (default: 1280; the window can be resized)")
     add_flir_settings(flv)

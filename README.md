@@ -22,7 +22,7 @@ Drivers and terminal control for the lab equipment:
 
 `--photos` and `--power` can be used together, for example pE-300 + FLIR + PM400 in one run.
 
-The code was split out of [LineTracker](https://github.com/matijalakner/LineTracker) (its `src/Canon`, `src/FLIR`, `src/ThorLabs`). The file layout and CSV formats are unchanged, so LineTracker's `measurement analysis folder` and `analysis report` read the photos and ramp logs written here as they are.
+The code was split out of [LineTracker](https://github.com/matijalakner/LineTracker) (its `src/Canon`, `src/FLIR`, `src/ThorLabs`). The CSV formats are unchanged, so LineTracker's `measurement analysis folder` and `analysis report` can read the photos and ramp logs written here. The data now lives under `data/` (`data/input/folder/<name>/`, `data/output/ramp/`), so give LineTracker those paths (`analysis folder data/input/folder/<name>`, `analysis report <name> --ramp data/output/ramp/<file>.csv`), or run this package with `--input-dir input --output-dir output` to keep the old layout.
 
 ## Contents
 
@@ -164,7 +164,7 @@ These options go with `--photos NAME`:
 
 | Option | Meaning |
 |---|---|
-| `--photos NAME` | Take photos, saved as `input/folder/NAME/NAME_XXXX.jpg` (numbering continues) |
+| `--photos NAME` | Take photos, saved as `data/input/folder/NAME/NAME_XXXX.jpg` (numbering continues) |
 | `--camera canon\|flir` | Which camera (default `canon`) |
 | `--photo-delay S` | One photo per step, `S` s after the step starts (default: half the step time) |
 | `--photo-interval S` | Instead: a photo every `S` s from the ramp start |
@@ -247,7 +247,7 @@ Settings are all optional; any you leave out keep the value set on the camera. E
 |---|---|
 | `flir list [--backend]` | Connected cameras with serial numbers. |
 | `flir info [--serial] [--backend]` | Current settings with their allowed values or ranges. |
-| `flir live [NAME]` | Live view in a window, showing frame rate, exposure, gain and % saturated pixels. Keys: `+`/`-` exposure, `]`/`[` gain, `o` marks saturated pixels red, `c` crosshair, `s` saves a full-resolution snapshot to `input/folder/NAME/`, `q` quits. On exit it prints the `--shutter`/`--gain` values to reuse in other commands. |
+| `flir live [NAME]` | Live view in a window, showing frame rate, exposure, gain and % saturated pixels. Keys: `+`/`-` exposure, `]`/`[` gain, `o` marks saturated pixels red, `c` crosshair, `s` saves a full-resolution snapshot to `data/input/folder/NAME/`, `q` quits. On exit it prints the `--shutter`/`--gain` values to reuse in other commands. |
 | `flir photo NAME [-i]` | One photo, software-triggered (a fresh exposure). |
 | `flir timelapse NAME -n S [--count N \| --duration S]` | A photo every `S` s. |
 | `flir video NAME [--duration S] [--fps F] [--codec mp4v]` | Records the stream to `.mp4` on the computer. A `_frames.csv` file holds the real time of every frame. |
@@ -274,17 +274,17 @@ For measurements, fix the exposure, gain and white balance (`--shutter 1/250 --g
 
 ## Where the data goes
 
-`--output-dir` (default `output`) holds the logs; `--input-dir` (default `input`) holds the photos and videos.
+`--output-dir` (default `data/output`) holds the logs; `--input-dir` (default `data/input`) holds the photos and videos. Both are relative to the folder you run the command from. The defaults are `DEFAULT_OUTPUT_DIR` / `DEFAULT_INPUT_DIR` in `src/equipment/utils.py`.
 
 | Command | File |
 |---|---|
-| `dc2200 ramp`, `pe300 ramp` | `output/ramp/ramp_<UTC>.csv`; with `--photos` also `ramp_<UTC>_photos.csv` and `input/folder/<name>/`; with `--power` also `ramp_<UTC>_power.csv` |
-| `pm400 measure` | `output/pm/pm_<UTC>.csv` |
-| `liv` | `output/liv/liv_<UTC>.csv` |
-| `canon ...` | `input/folder/<name>/<name>_XXXX.jpg`/`.mp4`, log `output/camera/camera_<UTC>.csv` |
-| `flir ...` | `input/folder/<name>/<name>_XXXX.jpg`/`.png`/`.tif`/`.mp4`, log `output/camera/flir_<UTC>.csv` |
+| `dc2200 ramp`, `pe300 ramp` | `data/output/ramp/ramp_<UTC>.csv`; with `--photos` also `ramp_<UTC>_photos.csv` and `data/input/folder/<name>/`; with `--power` also `ramp_<UTC>_power.csv` |
+| `pm400 measure` | `data/output/pm/pm_<UTC>.csv` |
+| `liv` | `data/output/liv/liv_<UTC>.csv` |
+| `canon ...` | `data/input/folder/<name>/<name>_XXXX.jpg`/`.mp4`, log `data/output/camera/camera_<UTC>.csv` |
+| `flir ...` | `data/input/folder/<name>/<name>_XXXX.jpg`/`.png`/`.tif`/`.mp4`, log `data/output/camera/flir_<UTC>.csv` |
 
-`--output-csv NAME` changes the file name. A plain name goes into the command's folder (`--output-csv run1.csv` → `output/ramp/run1.csv`); a name that contains a folder is used as given. CSVs are written also when a run is interrupted.
+`--output-csv NAME` changes the file name. A plain name goes into the command's folder (`--output-csv run1.csv` → `data/output/ramp/run1.csv`); a name that contains a folder is used as given. CSVs are written also when a run is interrupted.
 
 The ramp, pm and camera CSVs start with a line `time_stamp,<UTC time at t = 0>`, then the header:
 
@@ -370,7 +370,7 @@ With either library:
 from equipment import main_ramp, main_source_ramp, main_paired_ramp, main_pe300_set
 
 rows = main_ramp({"i_min": 0, "i_max": 0.5, "step": 0.05, "step_time": 2,      # DC2200
-                  "output_csv": "output/ramp/run1.csv"})
+                  "output_csv": "data/output/ramp/run1.csv"})
 
 main_pe300_set({"intensity": 30, "channels": "ABC"})                           # stays on
 
@@ -383,7 +383,7 @@ out = main_paired_ramp({"source": "pe300", "min": 0, "max": 100, "step": 10,
                         "camera": "mysample", "camera_type": "flir",
                         "shutter": "1/250", "gain": 0, "whitebalance": "off",
                         "power": True, "wavelength": 470,
-                        "output_csv": "output/ramp/run2.csv"})
+                        "output_csv": "data/output/ramp/run2.csv"})
 # out = {"rows": ramp rows, "photos": [files], "power": [power rows]}
 ```
 

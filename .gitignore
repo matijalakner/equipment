@@ -8,5 +8,6 @@ venv/
 equip/
 .pytest_cache/
 # measurement data
+data/
 output/
 input/

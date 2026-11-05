@@ -33,7 +33,7 @@ from pathlib import Path
 from ..capture import capture_folder, next_index, numbered_path
 from ..ramp import ramp_plan, read_ramp_cfg, run_ramp
 from ..sources import make_source, source_class
-from ..utils import read_cfg, utc_timestamp
+from ..utils import DEFAULT_INPUT_DIR, read_cfg, utc_timestamp
 
 
 def schedule_times(n_steps, step_time, delay=None, interval=None):
@@ -250,7 +250,7 @@ def main_paired_ramp(cfg):
         if want_photos else []
     power_times = schedule_times(n, st, get("power_delay"), get("power_interval")) \
         if want_power else []
-    folder = capture_folder(get("camera"), get("input_dir") or "input") if want_photos \
+    folder = capture_folder(get("camera"), get("input_dir") or DEFAULT_INPUT_DIR) if want_photos \
         else None
 
     recorders, photos, power = [], None, None
